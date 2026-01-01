@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loadPosts, savePosts, loadUser } from '../utils/storage'
 import { categories } from '../data/categories'
@@ -10,7 +10,11 @@ export default function Upload() {
   const [error, setError] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const navigate = useNavigate()
-  const user = loadUser() || { id: Date.now(), name: 'Usuário' }
+  
+  const user = useMemo(() => {
+    const existingUser = loadUser()
+    return existingUser || { id: Math.random().toString(36).substr(2, 9), name: 'Usuário' }
+  }, [])
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]

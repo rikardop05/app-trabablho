@@ -1,21 +1,32 @@
-import { Link } from 'react-router-dom'
-import { Home, Plus, User } from 'lucide-react'
+import { Link, useLocation } from "react-router-dom"
+import { Home, PlusSquare, User } from "lucide-react"
 
 export default function Navbar() {
+  const { pathname } = useLocation()
+
+  const item = (path) =>
+    `flex flex-col items-center gap-1 ${
+      pathname === path
+        ? "text-pink-600"
+        : "text-gray-500 dark:text-gray-300"
+    }`
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 shadow-lg">
-      <div className="flex justify-around items-center h-16">
-        <Link to="/" className="flex flex-col items-center justify-center h-full w-full text-gray-600 dark:text-gray-300 hover:text-pink-600 transition-colors">
-          <Home size={24} strokeWidth={2} />
-          <span className="text-xs mt-1">Home</span>
+    <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-gray-900 px-8 py-3 rounded-full shadow-lg">
+      <div className="flex gap-10">
+        <Link to="/" className={item("/")}>
+          <Home size={22} />
+          <span className="text-xs">Home</span>
         </Link>
-        <Link to="/upload" className="flex flex-col items-center justify-center h-full w-full text-gray-600 dark:text-gray-300 hover:text-pink-600 transition-colors">
-          <Plus size={24} strokeWidth={2} />
-          <span className="text-xs mt-1">Novo</span>
+
+        <Link to="/upload" className={item("/upload")}>
+          <PlusSquare size={22} />
+          <span className="text-xs">Novo</span>
         </Link>
-        <Link to="/profile" className="flex flex-col items-center justify-center h-full w-full text-gray-600 dark:text-gray-300 hover:text-pink-600 transition-colors">
-          <User size={24} strokeWidth={2} />
-          <span className="text-xs mt-1">Perfil</span>
+
+        <Link to="/profile" className={item("/profile")}>
+          <User size={22} />
+          <span className="text-xs">Perfil</span>
         </Link>
       </div>
     </nav>

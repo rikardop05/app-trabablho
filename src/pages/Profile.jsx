@@ -1,84 +1,89 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { loadUser, clearUser, loadReports, loadPosts } from '../utils/storage'
-import { categoryToOrg } from '../data/categories'
+import { useEffect, useState } from "react"
+import { loadUser, saveUser, clearUser, loadPosts } from "../utils/storage"
+import { useNavigate } from "react-router-dom"
 
 export default function Profile() {
-  const [user, setUser] = useState(null)
-  const [reports, setReports] = useState([])
-  const [userPosts, setUserPosts] = useState([])
   const navigate = useNavigate()
+  const [user, setUser] = useState(loadUser())
+  const [dark, setDark] = useState(
+    localStorage.getItem("dark_mode") === "true"
+  )
+  const posts = loadPosts().slice(0, 6)
 
   useEffect(() => {
-    const currentUser = loadUser()
-    if (currentUser) {
-      setUser(currentUser)
-      const userPosts = loadPosts().filter(post => post.user?.id === currentUser.id)
-      setUserPosts(userPosts)
-      setReports(loadReports().filter(r => r.user === currentUser.name))
+    document.documentElement.classList.toggle("dark", dark)
+    localStorage.setItem("dark_mode", dark)
+  }, [dark])
+
+  const uploadAvatar = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      const updated = { ...user, avatar: reader.result }
+      saveUser(updated)
+      setUser(updated)
     }
-  }, [])
-
-  const handleLogout = () => {
-    clearUser()
-    navigate('/login')
+    reader.readAsDataURL(file)
   }
 
-  if (!user) {
-    return (
-      <div className="p-4 text-center">
-        <p className="text-gray-600">Faça login para ver seu perfil</p>
-      </div>
-    )
-  }
+  if (!user) return null
 
   return (
-    <div className="p-4 pb-20">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
-            <p className="text-gray-600 dark:text-gray-300">{user.email || 'usuário@email.com'}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-3 py-1 rounded text-sm"
-          >
-            Sair
-          </button>
+    <div className="p-4 pb-32">
+      {/* Header */}
+      <div className="flex items-center gap-6">
+        <img
+          src={user.avatar || "https://i.pravatar.cc/150"}
+          className="w-24 h-24 rounded-full object-cover"
+        />
+
+        <div>
+          <h2 className="text-xl font-bold">{user.name || "Usuário"}</h2>
+          <p className="text-gray-500 text-sm">Bio do usuário</p>
+
+          <label className="text-sm text-blue-600 cursor-pointer block mt-2">
+            Alterar foto
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={uploadAvatar}
+            />
+          </label>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-6">
-        <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Suas Denúncias</h2>
-        {userPosts.length === 0 ? (
-          <p className="text-gray-600 dark:text-gray-300">Você ainda não fez nenhuma denúncia</p>
-        ) : (
-          <p className="text-gray-600 dark:text-gray-300">{userPosts.length} denúncia(s) feita(s)</p>
-        )}
+      {/* Grid */}
+      <div className="grid grid-cols-3 gap-1 mt-6">
+        {posts.map((post) => (
+          <img
+            key={post.id}
+            src={post.image}
+            className="aspect-square object-cover"
+          />
+        ))}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
-        <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Relatório de Denúncias</h2>
-        
-        {reports.length === 0 ? (
-          <p className="text-gray-600 dark:text-gray-300">Nenhuma denúncia oficial registrada</p>
-        ) : (
-          <div className="space-y-3">
-            {reports.map(report => (
-              <div key={report.id} className="border-b pb-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{report.org}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{report.category}</p>
-                    <p className="text-xs text-gray-500">{new Date(report.date).toLocaleString()}</p>
-                  </div>
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Enviado</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+      {/* Actions */}
+      <div className="mt-8 space-y-3">
+        <button
+          onClick={() => setDark(!dark)}
+          className="w-full bg-gray-200 dark:bg-gray-700 py-2 rounded"
+        >
+          {dark ? "Modo Claro" : "Modo Escuro"}
+        </button>
+
+        <button
+          onClick={() => {
+            clearUser()
+            navigate("/login")
+          }}
+          className="w-full bg-red-500 text-white py-2 rounded"
+        >
+          Logout
+        </button>
       </div>
     </div>
   )

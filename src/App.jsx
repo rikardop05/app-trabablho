@@ -1,30 +1,27 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { useEffect } from 'react'
-import Navbar from './components/Navbar'
-import Feed from './pages/Feed'
-import Upload from './pages/Upload'
-import Profile from './pages/Profile'
-import Login from './pages/Login'
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import MainLayout from "./layouts/MainLayout"
+
+import Feed from "./pages/Feed"
+import Upload from "./pages/Upload"
+import Profile from "./pages/Profile"
+import Login from "./pages/Login"
+import StoriesPage from "./pages/StoriesPage"
 
 export default function App() {
-  useEffect(() => {
-    const saved = localStorage.getItem('dark_mode') === 'true'
-    if (saved) {
-      document.documentElement.classList.add('dark')
-    }
-  }, [])
-
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
-        <Routes>
+      <Routes>
+        {/* Rotas COM menu */}
+        <Route element={<MainLayout />}>
           <Route path="/" element={<Feed />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
-        <Navbar />
-      </div>
+        </Route>
+
+        {/* Rotas SEM menu (fullscreen) */}
+        <Route path="/stories/:userId" element={<StoriesPage />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
     </BrowserRouter>
   )
 }
