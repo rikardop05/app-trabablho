@@ -8,4 +8,13 @@
 /* Se quiser, pode adicionar estilos globais seus abaixo */
 body {
   font-family: sans-serif;
+  background-color: white;
+  color: black;
+  padding-bottom: 4rem;
+}
+
+.dark body {
+  background-color: #111827; /* gray-900 */
+  color: white;
+  padding-bottom: 4rem;
 }
