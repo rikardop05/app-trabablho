@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { loadPosts, savePosts, loadUser } from '../utils/storage'
+import { loadPosts, savePosts, loadUser, loadStories, saveStories, MAX_STORAGE_SIZE } from '../utils/storage'
+import { compressImage } from '../utils/imageUtils'
 import { categories } from '../data/categories'
 
 export default function Upload() {
@@ -16,7 +17,7 @@ export default function Upload() {
     return existingUser || { id: Math.random().toString(36).substr(2, 9), name: 'Usuário' }
   }, [])
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0]
     if (!file) return
     
@@ -24,15 +25,29 @@ export default function Upload() {
       setError('Por favor, selecione um arquivo de imagem')
       return
     }
-    
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Arquivo muito grande. Máximo 5MB')
+
+    // Check file size (20MB limit before compression)
+    const maxSize = 20 * 1024 * 1024 // 20MB
+    if (file.size > maxSize) {
+      setError('A imagem é muito grande. Por favor, selecione uma imagem menor que 20MB')
       return
     }
     
-    const reader = new FileReader()
-    reader.onload = () => setImage(reader.result)
-    reader.readAsDataURL(file)
+    try {
+      console.log('Original file:', file.name, file.size, file.type)
+      // Compress image before setting state
+      const compressedImage = await compressImage(file, {
+        maxWidth: 2000,
+        maxHeight: 2000,
+        quality: 0.9,
+        maxSize: 0 // No size limit
+      })
+      console.log('Compressed image size:', compressedImage.length)
+      setImage(compressedImage)
+    } catch (error) {
+      setError('Falha ao processar a imagem. Por favor, tente outra imagem.')
+      console.error('Image compression error:', error)
+    }
   }
 
   const handleSubmit = (e) => {
@@ -55,9 +70,9 @@ export default function Upload() {
     }
     
     setIsUploading(true)
-    
+
     const newPost = {
-      id: Date.now(),
+      id: Date.now().toString(),
       user: {
         id: user.id,
         name: user.name
@@ -68,12 +83,20 @@ export default function Upload() {
       likes: 0,
       comments: []
     }
-    
+
     const existingPosts = loadPosts() || []
     const updatedPosts = [newPost, ...existingPosts]
-    
+
+    console.log('Saving post with image size:', newPost.image.length)
     savePosts(updatedPosts)
-    
+    console.log('Posts saved:', loadPosts().length)
+
+    const existingStories = loadStories() || []
+    const updatedStories = [newPost, ...existingStories]
+    console.log('Saving stories:', updatedStories.length)
+    saveStories(updatedStories)
+    console.log('Stories saved:', loadStories().length)
+
     setTimeout(() => {
       setIsUploading(false)
       navigate('/')
@@ -81,7 +104,7 @@ export default function Upload() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 pb-20">
+    <div className="max-w-md mx-auto p-4 pb-24">
       <h1 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Nova Denúncia</h1>
 
       {error && (

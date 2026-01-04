@@ -1,38 +1,65 @@
 import { useNavigate } from "react-router-dom"
-import { loadUser } from "../utils/storage"
-
-const mockUsers = [
-  { id: 1, name: "Ana" },
-  { id: 2, name: "Carlos" },
-  { id: 3, name: "Julia" },
-  { id: 4, name: "Marcos" },
-]
+import { loadUser, loadStories, loadUsers } from "../utils/storage"
 
 export default function StoriesBar() {
   const navigate = useNavigate()
+
   const user = loadUser()
+  const stories = loadStories() || []
+  const users = loadUsers() || []
+
+  // remove duplicação do usuário logado
+  const allUsers = [
+    user,
+    ...users.filter((u) => u.id !== user?.id),
+  ].filter(Boolean)
+
+  const getUserStories = (userId) =>
+    stories.filter((story) => story.user?.id === userId)
 
   return (
-    <div className="flex justify-center gap-6 overflow-x-auto py-4">
-      {[{ id: "me", name: "Você" }, ...mockUsers].map((u) => (
-        <button
-          key={u.id}
-          onClick={() => navigate(`/stories/${u.id}`)}
-          className="flex flex-col items-center min-w-[80px]"
-        >
-          <div className="w-20 h-20 rounded-full p-[3px] bg-gradient-to-tr from-pink-500 to-yellow-400">
-            <img
-              src={
-                u.id === "me" && user?.avatar
-                  ? user.avatar
-                  : `https://i.pravatar.cc/150?u=${u.id}`
-              }
-              className="w-full h-full rounded-full object-cover bg-white"
-            />
-          </div>
-          <span className="text-sm mt-2 text-gray-700 dark:text-gray-300">{u.name}</span>
-        </button>
-      ))}
+    <div className="flex justify-center gap-10 py-6 bg-transparent">
+      {allUsers.map((u) => {
+        const userStories = getUserStories(u.id)
+        const hasStories = userStories.length > 0
+
+        return (
+          <button
+            key={u.id}
+            onClick={() =>
+              navigate(u.id === user?.id ? "/profile" : `/profile/${u.id}`)
+            }
+            className="flex flex-col items-center bg-transparent border-none outline-none"
+          >
+            {/* BORDA DEGRADÊ VERDE */}
+            <div className="w-[150px] h-[150px] rounded-full p-[3px]" style={{ background: 'linear-gradient(to bottom right, #d1d5db, #374151)' }}>
+              {/* anel interno */}
+              <div className="w-full h-full rounded-full bg-[#1f2937] p-[4px]" style={{ width: '150px', height: '150px' }}>
+                <img
+                  src={
+                    u.avatar
+                      ? u.avatar
+                      : hasStories
+                      ? userStories[0].image
+                      : `https://i.pravatar.cc/150?u=${u.id}`
+                  }
+                  alt={u.name || "Usuário"}
+                  className="w-full h-full rounded-full object-cover"
+                  style={{ width: '150px', height: '150px' }}
+                />
+              </div>
+            </div>
+
+            {/* TEXTO SEMPRE BRANCO + MAIS ESPAÇO */}
+            <span
+              className="text-sm font-medium mt-4"
+              style={{ marginTop: '1rem', color: document.documentElement.classList.contains('dark') ? 'white' : 'black' }}
+            >
+              {u.name || "Usuário"}
+            </span>
+          </button>
+        )
+      })}
     </div>
   )
 }

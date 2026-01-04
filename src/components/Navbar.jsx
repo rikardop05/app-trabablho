@@ -1,34 +1,55 @@
 import { Link, useLocation } from "react-router-dom"
-import { Home, PlusSquare, User } from "lucide-react"
+import { Home, PlusCircle, User } from "lucide-react"
 
 export default function Navbar() {
-  const { pathname } = useLocation()
+  const location = useLocation()
 
-  const item = (path) =>
-    `flex flex-col items-center gap-1 ${
-      pathname === path
-        ? "text-pink-600"
-        : "text-gray-500 dark:text-gray-300"
-    }`
+  if (location.pathname === "/login") return null
+
+  const isActive = (path) => location.pathname === path
+
+  const itemStyle = (path) => ({
+    flex: 1,
+    textAlign: "center",
+    padding: "8px",
+    backgroundColor: isActive(path) ? "#374151" : "#1F2937",
+    color: "#FFFFFF", // FORÇA TEXTO BRANCO
+    textDecoration: "none",
+  })
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg">
-      <div className="flex justify-around items-center py-3 px-4">
-        <Link to="/" className={item("/")}>
-          <Home size={22} />
-          <span className="text-xs">Home</span>
-        </Link>
+    <div
+      style={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        width: "100%",
+        height: "64px",
+        display: "flex",
+        backgroundColor: "#111827",
+        zIndex: 9999,
+      }}
+    >
+      <Link to="/" style={itemStyle("/")}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Home size={24} color="white" />
+          <span style={{ fontSize: "12px", color: "white" }}>Home</span>
+        </div>
+      </Link>
 
-        <Link to="/upload" className={item("/upload")}>
-          <PlusSquare size={22} />
-          <span className="text-xs">Novo</span>
-        </Link>
+      <Link to="/upload" style={itemStyle("/upload")}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <PlusCircle size={24} color="white" />
+          <span style={{ fontSize: "12px", color: "white" }}>Novo</span>
+        </div>
+      </Link>
 
-        <Link to="/profile" className={item("/profile")}>
-          <User size={22} />
-          <span className="text-xs">Perfil</span>
-        </Link>
-      </div>
-    </nav>
+      <Link to="/profile" style={itemStyle("/profile")}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <User size={24} color="white" />
+          <span style={{ fontSize: "12px", color: "white" }}>Perfil</span>
+        </div>
+      </Link>
+    </div>
   )
 }

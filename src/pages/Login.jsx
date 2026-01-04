@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { saveUser } from '../utils/storage'
+import { saveUser, loadUsers } from '../utils/storage'
 
 export default function Login() {
   const [name, setName] = useState('')
@@ -15,10 +15,15 @@ export default function Login() {
       return
     }
     
-    const user = {
-      id: Date.now(),
-      name: name.trim(),
-      email: email.trim() || `${name.trim().toLowerCase()}@email.com`
+    const users = loadUsers()
+    let user = users.find(u => u.email === email.trim())
+    
+    if (!user) {
+      user = {
+        id: Date.now(),
+        name: name.trim(),
+        email: email.trim() || `${name.trim().toLowerCase()}@email.com`
+      }
     }
     
     saveUser(user)

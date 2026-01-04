@@ -6,6 +6,7 @@ import Upload from "./pages/Upload"
 import Profile from "./pages/Profile"
 import Login from "./pages/Login"
 import StoriesPage from "./pages/StoriesPage"
+import PostDetail from "./pages/PostDetail"
 
 export default function App() {
   return (
@@ -16,10 +17,12 @@ export default function App() {
           <Route path="/" element={<Feed />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:userId" element={<Profile />} />
         </Route>
 
-        {/* Rotas SEM menu (fullscreen) */}
+        {/* Rotas SEM menu */}
         <Route path="/stories/:userId" element={<StoriesPage />} />
+        <Route path="/post/:postId" element={<PostDetail />} />
         <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>

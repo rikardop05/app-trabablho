@@ -8,13 +8,27 @@ export default function Feed() {
 
   useEffect(() => {
     setPosts(loadPosts())
+    
+    const handlePostsUpdate = () => {
+      setPosts(loadPosts())
+    }
+    
+    window.addEventListener('posts_updated', handlePostsUpdate)
+    
+    return () => {
+      window.removeEventListener('posts_updated', handlePostsUpdate)
+    }
   }, [])
 
   return (
-    <div className="p-4 pb-32">
-      <StoriesBar />
+    <div className="pb-24">
+      {/* STORIES — fora do container com padding */}
+      <div className="w-full overflow-x-hidden">
+        <StoriesBar />
+      </div>
 
-      <div className="mt-6 space-y-4">
+      {/* FEED */}
+      <div className="p-4 mt-6 space-y-4">
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}

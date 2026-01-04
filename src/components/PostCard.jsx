@@ -13,7 +13,7 @@ export default function PostCard({ post, onUpdate }) {
   const handleLike = () => {
     const updatedPost = { ...post, likes: likes + 1 }
     const allPosts = JSON.parse(localStorage.getItem('app_posts_v1')) || []
-    const updatedPosts = allPosts.map(p => p.id === post.id ? updatedPost : p)
+    const updatedPosts = allPosts.map(p => p.id.toString() === post.id.toString() ? updatedPost : p)
     savePosts(updatedPosts)
     setLikes(likes + 1)
     if (onUpdate) onUpdate()
@@ -33,7 +33,7 @@ export default function PostCard({ post, onUpdate }) {
     }
     
     const allPosts = JSON.parse(localStorage.getItem('app_posts_v1')) || []
-    const updatedPosts = allPosts.map(p => p.id === post.id ? updatedPost : p)
+    const updatedPosts = allPosts.map(p => p.id.toString() === post.id.toString() ? updatedPost : p)
     savePosts(updatedPosts)
     setComments(updatedPost.comments)
     setNewComment('')
@@ -70,7 +70,7 @@ export default function PostCard({ post, onUpdate }) {
       </div>
 
       {post.image && (
-        <img src={post.image} alt="Post" className="w-full h-48 object-cover rounded mb-3" />
+        <img src={post.image} alt="Post" className="w-full h-48 object-cover rounded-lg mb-3 shadow-md" />
       )}
 
       <p className="text-gray-700 dark:text-gray-300 mb-3">{post.caption}</p>

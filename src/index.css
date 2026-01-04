@@ -10,11 +10,15 @@ body {
   font-family: sans-serif;
   background-color: white;
   color: black;
-  padding-bottom: 4rem;
+  margin: 0;
+  padding: 0;
 }
 
 .dark body {
   background-color: #111827; /* gray-900 */
   color: white;
-  padding-bottom: 4rem;
+}
+
+.dark .bg-gray-50 {
+  background-color: #1f2937; /* gray-800 */
 }
