@@ -28,17 +28,21 @@ export function savePosts(posts) {
 export function loadUser() {
   try {
     const raw = localStorage.getItem(USER_KEY)
-    return raw ? JSON.parse(raw) : null
-  } catch {
+    const user = raw ? JSON.parse(raw) : null
+    console.log('loadUser chamado, usuário:', user)
+    return user
+  } catch (error) {
+    console.error('Erro ao carregar usuário:', error)
     return null
   }
 }
 
 export function saveUser(user) {
   try {
+    console.log('Salvando usuário:', user)
     const users = loadUsers()
     const existingUserIndex = users.findIndex(u => u.id === user.id)
-    
+     
     let updatedUsers
     if (existingUserIndex >= 0) {
       updatedUsers = [...users]
@@ -46,11 +50,27 @@ export function saveUser(user) {
     } else {
       updatedUsers = [...users, user]
     }
-    
+     
+    // Verifica se o avatar é muito grande
+    if (user.avatar && user.avatar.length > MAX_STORAGE_SIZE / 10) {
+      console.warn('Avatar muito grande, removendo para evitar quota excedida')
+      user = { ...user, avatar: null }
+      updatedUsers = updatedUsers.map(u => u.id === user.id ? user : u)
+    }
+     
     localStorage.setItem(USER_KEY, JSON.stringify(user))
     localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
-  } catch {
-    // Silent fail
+    console.log('Usuário salvo com sucesso')
+  } catch (error) {
+    console.error('Erro ao salvar usuário:', error)
+    // Tentar salvar sem o avatar se houver erro de quota
+    if (error.name === 'QuotaExceededError' && user.avatar) {
+      console.warn('Tentando salvar usuário sem avatar devido à quota excedida')
+      const userWithoutAvatar = { ...user, avatar: null }
+      localStorage.setItem(USER_KEY, JSON.stringify(userWithoutAvatar))
+      const updatedUsers = loadUsers().map(u => u.id === user.id ? userWithoutAvatar : u)
+      localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
+    }
   }
 }
 
@@ -108,5 +128,38 @@ export function saveUsers(users) {
     localStorage.setItem('app_users_v1', JSON.stringify(users))
   } catch {
     // Silent fail
+  }
+}
+
+export function clearAllData() {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(USER_KEY)
+    localStorage.removeItem(REPORTS_KEY)
+    localStorage.removeItem(STORIES_KEY)
+    localStorage.removeItem(USERS_KEY)
+    console.log('Todos os dados foram removidos do storage')
+  } catch (error) {
+    console.error('Erro ao limpar dados do storage:', error)
+  }
+}
+
+export function unifyStorage() {
+  try {
+    const posts = loadPosts()
+    const user = loadUser()
+    const reports = loadReports()
+    const stories = loadStories()
+    const users = loadUsers()
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts))
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+    localStorage.setItem(REPORTS_KEY, JSON.stringify(reports))
+    localStorage.setItem(STORIES_KEY, JSON.stringify(stories))
+    localStorage.setItem(USERS_KEY, JSON.stringify(users))
+    
+    console.log('Storage unificado com sucesso')
+  } catch (error) {
+    console.error('Erro ao unificar storage:', error)
   }
 }

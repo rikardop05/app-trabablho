@@ -3,10 +3,12 @@ import { loadUser, saveUser, clearUser, loadPosts, loadUsers } from "../utils/st
 import { compressImage } from "../utils/imageUtils"
 import { useNavigate, useParams } from "react-router-dom"
 import { Sun, Moon, LogOut, Upload, Edit2 } from "lucide-react"
+import BioEditModal from "../components/BioEditModal"
 
 export default function Profile() {
   const navigate = useNavigate()
   const { userId } = useParams()
+
   const [user, setUser] = useState(() => {
     if (userId) {
       const users = loadUsers()
@@ -14,10 +16,16 @@ export default function Profile() {
     }
     return loadUser()
   })
+
   const [dark, setDark] = useState(
     localStorage.getItem("dark_mode") === "true"
   )
-  const posts = loadPosts().filter(post => post.user.id === user?.id).slice(0, 6)
+  const [isBioEditModalOpen, setIsBioEditModalOpen] = useState(false)
+
+  const posts = loadPosts()
+    .filter(post => post.user.id === user?.id)
+    .slice(0, 6)
+
   const isCurrentUser = !userId || userId === loadUser()?.id
 
   useEffect(() => {
@@ -34,15 +42,22 @@ export default function Profile() {
         maxWidth: 300,
         maxHeight: 300,
         quality: 0.9,
-        maxSize: 0 // No size limit for avatars
+        maxSize: 0
       })
-      
+
       const updated = { ...user, avatar: compressedAvatar }
       saveUser(updated)
       setUser(updated)
     } catch (error) {
-      console.error('Failed to compress avatar:', error)
+      console.error("Failed to compress avatar:", error)
     }
+  }
+
+  const handleSaveBio = (newBio) => {
+    const updated = { ...user, bio: newBio }
+    saveUser(updated)
+    setUser(updated)
+    setIsBioEditModalOpen(false)
   }
 
   if (!user) {
@@ -51,75 +66,91 @@ export default function Profile() {
   }
 
   return (
-    <div className="flex flex-col p-4 pb-24 relative" style={{ position: 'relative' }}>
-      {/* Theme Toggle and Logout Buttons */}
+    <div className="flex flex-col p-4 pb-24 relative">
+      {/* Theme + Logout */}
       <div className="absolute top-4 right-4 flex gap-2" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
         <button
           onClick={() => setDark(!dark)}
           className="p-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-          aria-label={dark ? "Modo Claro" : "Modo Escuro"}
         >
-          {dark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-gray-800 dark:text-white" />}
+          {dark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5" />}
         </button>
+
         <button
           onClick={() => {
             clearUser()
             navigate("/login")
           }}
           className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-          aria-label="Logout"
         >
           <LogOut className="w-5 h-5" />
         </button>
       </div>
 
       {/* Header */}
-      <div className="flex flex-col items-center gap-4 w-full max-w-md mt-12">
+      <div className="flex flex-col items-center w-full max-w-md mx-auto mt-12 px-4">
         <img
           src={user.avatar || "https://i.pravatar.cc/150"}
-          className="w-[150px] h-[150px] rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg"
+          className="w-[140px] h-[140px] sm:w-[150px] sm:h-[150px] rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl"
         />
 
-        <div className="text-center mt-4">
-          <h2 className="text-2xl font-bold dark:text-white">{user.name || "Usuário"}</h2>
-          <p className="text-gray-500 text-sm mt-1">Bio do usuário</p>
+        <div className="text-center mt-6 w-full">
+          <h2 className="text-2xl font-semibold dark:text-white">
+            {user.name || "Usuário"}
+          </h2>
+
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+            Perfil público
+          </p>
 
           {isCurrentUser && (
-            <label className="text-sm text-blue-600 cursor-pointer block mt-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center justify-between gap-4">
+            <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm rounded-full bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
               Alterar foto
-              <Upload className="w-5 h-5" />
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={uploadAvatar}
-              />
+              <Upload className="w-4 h-4" />
+              <input type="file" hidden accept="image/*" onChange={uploadAvatar} />
             </label>
           )}
-          <div className="mt-4 flex items-center justify-between gap-4">
-            <span className="text-gray-500 text-sm">Bio do usuário</span>
-            {isCurrentUser && <Edit2 className="w-5 h-5 text-gray-500 cursor-pointer" />}
+
+          {/* Bio header */}
+          <div className="mt-8 max-w-sm mx-auto w-full flex items-center justify-center px-1">
+            {isCurrentUser && (
+              <button
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm rounded-full bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                onClick={() => setIsBioEditModalOpen(true)}
+              >
+                Editar Bio
+                <Edit2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Bio content */}
+          <div className="mt-20 max-w-sm mx-auto w-full rounded-xl bg-gray-100 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 leading-relaxed" style={{ marginTop: '35px' }}>
+            {user.bio || "Nenhuma bio adicionada ainda."}
           </div>
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-3 gap-2 mt-8 w-full max-w-md">
-        {posts.map((post) => (
-          <div key={post.id} className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md relative">
+      {/* Posts grid */}
+      <div className="grid grid-cols-3 gap-2 mt-10 w-full max-w-md mx-auto">
+        {posts.map(post => (
+          <div key={post.id} className="aspect-square rounded-lg overflow-hidden relative">
             <img
               src={post.image}
-              className="w-full h-full object-cover rounded-lg"
-              alt={`Post ${post.id}`}
+              className="w-full h-full object-cover"
               onClick={() => navigate(`/post/${post.id}`)}
             />
-            <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-              <span>👍</span>
-              <span>{post.likes || 0}</span>
-            </div>
           </div>
         ))}
       </div>
+
+      {isBioEditModalOpen && (
+        <BioEditModal
+          user={user}
+          onSave={handleSaveBio}
+          onClose={() => setIsBioEditModalOpen(false)}
+        />
+      )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { loadPosts, savePosts } from "../utils/storage";
+import { getUserAvatar } from "../utils/imageUtils";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Heart, MessageCircle } from "lucide-react";
 import CommentsModal from "../components/CommentsModal";
@@ -79,7 +80,7 @@ export default function PostDetail() {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <img
-                src={post.user.avatar || `https://i.pravatar.cc/40?u=${post.user.id}`}
+                src={getUserAvatar(post.user)}
                 alt={post.user.name}
                 className="w-8 h-8 rounded-full"
               />
@@ -111,7 +112,7 @@ export default function PostDetail() {
               {post.comments.slice(0, 2).map((comment, index) => (
                 <div key={index} className="flex items-start gap-2 mb-2">
                   <img
-                    src={`https://i.pravatar.cc/32?u=${comment.user || comment.id}`}
+                    src={getUserAvatar({ id: comment.user || comment.id, avatar: null })}
                     alt="Comentário"
                     className="w-6 h-6 rounded-full mt-1"
                   />

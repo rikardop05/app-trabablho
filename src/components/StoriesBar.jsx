@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { loadUser, loadStories, loadUsers } from "../utils/storage"
+import { getUserAvatar } from "../utils/imageUtils"
 
 export default function StoriesBar() {
   const navigate = useNavigate()
@@ -18,7 +19,7 @@ export default function StoriesBar() {
     stories.filter((story) => story.user?.id === userId)
 
   return (
-    <div className="flex justify-center gap-10 py-6 bg-transparent">
+    <div className="flex justify-start gap-10 py-6 bg-transparent overflow-x-auto w-full">
       {allUsers.map((u) => {
         const userStories = getUserStories(u.id)
         const hasStories = userStories.length > 0
@@ -38,10 +39,10 @@ export default function StoriesBar() {
                 <img
                   src={
                     u.avatar
-                      ? u.avatar
+                      ? getUserAvatar(u)
                       : hasStories
                       ? userStories[0].image
-                      : `https://i.pravatar.cc/150?u=${u.id}`
+                      : getUserAvatar(u)
                   }
                   alt={u.name || "Usuário"}
                   className="w-full h-full rounded-full object-cover"

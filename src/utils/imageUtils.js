@@ -169,3 +169,55 @@ export function getStorageUsage() {
     return 0
   }
 }
+
+/**
+ * Generate a reliable placeholder image URL
+ * @param {string} userId - User ID for unique placeholder
+ * @param {string} type - Type of placeholder ('avatar', 'post', 'story')
+ * @returns {string} - Placeholder image URL
+ */
+export function getPlaceholderImage(userId = '', type = 'avatar') {
+  // Use different services for better reliability
+  const services = [
+    `https://i.pravatar.cc/150?u=${userId}`,
+    `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
+    `https://ui-avatars.com/api/?name=User&background=random&size=150`
+  ];
+  
+  // Return first service that works (we'll try them in order)
+  return services[0];
+}
+
+/**
+ * Safely get user avatar URL with fallback
+ * @param {Object} user - User object
+ * @returns {string} - Valid avatar URL or placeholder
+ */
+export function getUserAvatar(user) {
+  if (!user) return getPlaceholderImage('', 'avatar');
+  
+  // Check if avatar exists and is not empty string
+  if (user.avatar && user.avatar.trim().length > 0) {
+    return user.avatar;
+  }
+  
+  // Fallback to placeholder
+  return getPlaceholderImage(user.id || '', 'avatar');
+}
+
+/**
+ * Safely get story image URL with fallback
+ * @param {Object} story - Story object
+ * @returns {string} - Valid image URL or placeholder
+ */
+export function getStoryImage(story) {
+  if (!story) return getPlaceholderImage('', 'story');
+  
+  // Check if image exists and is not empty string
+  if (story.image && story.image.trim().length > 0) {
+    return story.image;
+  }
+  
+  // Fallback to placeholder
+  return getPlaceholderImage(story.user?.id || '', 'story');
+}

@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Heart, MessageCircle, AlertCircle } from 'lucide-react'
+import { AlertTriangle, MessageCircle, AlertCircle } from 'lucide-react'
 import { savePosts, saveReport, loadUser } from '../utils/storage'
 import { categoryToOrg } from '../data/categories'
 
-export default function PostCard({ post, onUpdate }) {
+export default function PostCard({ post, onUpdate, isLast = false }) {
   const [likes, setLikes] = useState(post.likes || 0)
   const [comments, setComments] = useState(post.comments || [])
   const [newComment, setNewComment] = useState('')
@@ -57,14 +57,14 @@ export default function PostCard({ post, onUpdate }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-4 p-4">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-4 px-0" style={{ paddingBottom: isLast ? '78px' : '16px', paddingLeft: '0px', paddingRight: '0px' }}>
       <div className="flex justify-between items-start mb-2">
         <div>
           <span className="font-semibold text-gray-900 dark:text-white">{post.user?.name || 'Anônimo'}</span>
           {post.category && (
-            <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
               {post.category}
-            </span>
+            </div>
           )}
         </div>
       </div>
@@ -75,16 +75,16 @@ export default function PostCard({ post, onUpdate }) {
 
       <p className="text-gray-700 dark:text-gray-300 mb-3">{post.caption}</p>
 
-      <div className="flex items-center gap-4 mb-3">
-        <button 
+      <div className="flex items-center gap-4 mb-8">
+        <button
           onClick={handleLike}
           className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-pink-600"
         >
-          <Heart size={18} fill={likes > 0 ? '#ec4899' : 'none'} />
+          <AlertTriangle size={18} fill={likes > 0 ? '#ef4444' : 'none'} />
           <span>{likes}</span>
         </button>
 
-        <button 
+        <button
           onClick={() => setShowComments(!showComments)}
           className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-pink-600"
         >
@@ -102,7 +102,7 @@ export default function PostCard({ post, onUpdate }) {
       </div>
 
       {showComments && (
-        <div className="mt-3 border-t pt-3">
+        <div className="mt- border-t pt-3">
           <div className="space-y-2 mb-3">
             {comments.map(comment => (
               <div key={comment.id} className="border-b pb-2">

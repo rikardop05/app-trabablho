@@ -28,9 +28,13 @@ export default function Feed() {
       </div>
 
       {/* FEED */}
-      <div className="p-4 mt-6 space-y-4">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+      <div className="p-4 mt-6 space-y-[50px]">
+        {posts.map((post, index) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            isLast={index === posts.length - 1}
+          />
         ))}
       </div>
     </div>
