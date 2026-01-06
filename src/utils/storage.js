@@ -5,6 +5,12 @@ export const STORIES_KEY = 'app_stories_v1'
 export const USERS_KEY = 'app_users_v1'
 export const MAX_STORAGE_SIZE = 1000 * 1024 * 1024 // 1GB
 
+export function resolveUserById(userId) {
+  const users = loadUsers();
+  return users.find(u => String(u.id) === String(userId)) || null;
+}
+
+
 export function loadPosts() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -37,12 +43,30 @@ export function loadUser() {
   }
 }
 
+export function loadCurrentUserId() {
+  try {
+    const raw = localStorage.getItem('currentUserId')
+    return raw ? JSON.parse(raw) : null
+  } catch (error) {
+    console.error('Erro ao carregar currentUserId:', error)
+    return null
+  }
+}
+
+export function saveCurrentUserId(userId) {
+  try {
+    localStorage.setItem('currentUserId', JSON.stringify(userId))
+  } catch (error) {
+    console.error('Erro ao salvar currentUserId:', error)
+  }
+}
+
 export function saveUser(user) {
   try {
     console.log('Salvando usuário:', user)
     const users = loadUsers()
     const existingUserIndex = users.findIndex(u => u.id === user.id)
-     
+      
     let updatedUsers
     if (existingUserIndex >= 0) {
       updatedUsers = [...users]
@@ -50,16 +74,17 @@ export function saveUser(user) {
     } else {
       updatedUsers = [...users, user]
     }
-     
+      
     // Verifica se o avatar é muito grande
     if (user.avatar && user.avatar.length > MAX_STORAGE_SIZE / 10) {
       console.warn('Avatar muito grande, removendo para evitar quota excedida')
       user = { ...user, avatar: null }
       updatedUsers = updatedUsers.map(u => u.id === user.id ? user : u)
     }
-     
+      
     localStorage.setItem(USER_KEY, JSON.stringify(user))
     localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
+    saveCurrentUserId(user.id)
     console.log('Usuário salvo com sucesso')
   } catch (error) {
     console.error('Erro ao salvar usuário:', error)
@@ -70,6 +95,7 @@ export function saveUser(user) {
       localStorage.setItem(USER_KEY, JSON.stringify(userWithoutAvatar))
       const updatedUsers = loadUsers().map(u => u.id === user.id ? userWithoutAvatar : u)
       localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers))
+      saveCurrentUserId(user.id)
     }
   }
 }

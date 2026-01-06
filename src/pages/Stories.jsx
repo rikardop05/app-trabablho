@@ -1,72 +1,105 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { loadPosts, savePosts } from "../utils/storage";
-import PostCard from "../components/PostCard";
+import { loadUsers, loadPosts, savePosts } from "../utils/storage";
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
+import PostCard from "../components/PostCard";
 
-/**
- * Stories page component for displaying user posts or placeholder image.
- */
 export default function Stories() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const [posts, setPosts] = useState([]);
+
+  const [user, setUser] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
 
   useEffect(() => {
-    const allPosts = loadPosts() || [];
-    const userPosts = allPosts.filter(p => String(p.user.id) === String(userId));
-    setPosts(userPosts);
+    // 1️⃣ Resolver usuário
+    const users = loadUsers() || [];
+    const resolvedUser = users.find(
+      u => String(u.id) === String(userId)
+    );
+
+    setUser(resolvedUser || null);
+
+    // 2️⃣ Resolver posts DO USUÁRIO
+    if (resolvedUser) {
+      const allPosts = loadPosts() || [];
+      const filteredPosts = allPosts.filter(
+        post => String(post.user?.id) === String(resolvedUser.id)
+      );
+      setUserPosts(filteredPosts);
+    } else {
+      setUserPosts([]);
+    }
   }, [userId]);
 
   const toggleLike = (postId) => {
-    setPosts(prev => {
-      const next = prev.map(p =>
-        String(p.id) === String(postId) ? { ...p, likes: (p.likes ?? 0) + 1 } : p
-      );
-      // Update global posts
-      const allPosts = loadPosts() || [];
-      const updatedAll = allPosts.map(p =>
-        String(p.id) === String(postId) ? { ...p, likes: (p.likes ?? 0) + 1 } : p
-      );
-      savePosts(updatedAll);
-      return next;
-    });
+    setUserPosts(prev =>
+      prev.map(p =>
+        String(p.id) === String(postId)
+          ? { ...p, likes: (p.likes ?? 0) + 1 }
+          : p
+      )
+    );
+
+    const allPosts = loadPosts() || [];
+    const updatedAll = allPosts.map(p =>
+      String(p.id) === String(postId)
+        ? { ...p, likes: (p.likes ?? 0) + 1 }
+        : p
+    );
+    savePosts(updatedAll);
   };
 
   const addComment = (postId, comment) => {
-    setPosts(prev => {
-      const next = prev.map(p =>
+    setUserPosts(prev =>
+      prev.map(p =>
         String(p.id) === String(postId)
           ? { ...p, comments: [...(p.comments || []), comment] }
           : p
-      );
-      // Update global posts
-      const allPosts = loadPosts() || [];
-      const updatedAll = allPosts.map(p =>
-        String(p.id) === String(postId)
-          ? { ...p, comments: [...(p.comments || []), comment] }
-          : p
-      );
-      savePosts(updatedAll);
-      return next;
-    });
+      )
+    );
+
+    const allPosts = loadPosts() || [];
+    const updatedAll = allPosts.map(p =>
+      String(p.id) === String(postId)
+        ? { ...p, comments: [...(p.comments || []), comment] }
+        : p
+    );
+    savePosts(updatedAll);
   };
 
-  const isPlaceholder = userId === "1" || userId === "2" || userId === "3";
+  // 🔴 Usuário não encontrado
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-20">
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-4 px-4 py-2 flex items-center gap-2"
+        >
+          <ArrowLeft size={20} />
+          Voltar
+        </button>
+        <p className="text-red-500">Usuário não encontrado.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-20">
       <button
         onClick={() => navigate(-1)}
-        className="mb-4 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors flex items-center gap-2"
-        title="Voltar"
+        className="mb-4 px-4 py-2 flex items-center gap-2"
       >
         <ArrowLeft size={20} />
         Voltar
       </button>
-      <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">Stories</h2>
-      {posts.length > 0 ? (
-        posts.map(p => (
+
+      <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">
+        Stories de {user.name}
+      </h2>
+
+      {userPosts.length > 0 ? (
+        userPosts.map(p => (
           <PostCard
             key={p.id}
             post={p}
@@ -74,18 +107,10 @@ export default function Stories() {
             onAddComment={addComment}
           />
         ))
-      ) : isPlaceholder ? (
-        <div className="text-center" data-view="story">
-          <img
-            src={`https://picsum.photos/600/900?random=${userId}`}
-            alt="Placeholder story"
-            className="max-w-full h-auto shadow-lg mx-auto w-[600px] h-[900px]"
-            data-view="story"
-          />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Esta é uma história de exemplo.</p>
-        </div>
       ) : (
-        <p className="text-gray-500 dark:text-gray-400">Nenhuma postagem para este usuário.</p>
+        <p className="text-gray-500 dark:text-gray-400">
+          Nenhuma postagem para este usuário.
+        </p>
       )}
     </div>
   );

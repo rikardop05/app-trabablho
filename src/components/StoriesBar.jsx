@@ -28,7 +28,7 @@ export default function StoriesBar() {
           <button
             key={u.id}
             onClick={() =>
-              navigate(u.id === user?.id ? "/profile" : `/profile/${u.id}`)
+              navigate(u.id === user?.id ? "/profile" : `/stories/${u.id}`)
             }
             className="flex flex-col items-center bg-transparent border-none outline-none"
           >

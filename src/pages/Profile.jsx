@@ -8,13 +8,14 @@ import BioEditModal from "../components/BioEditModal"
 export default function Profile() {
   const navigate = useNavigate()
   const { userId } = useParams()
-
+  const currentUser = loadUser()
+      
   const [user, setUser] = useState(() => {
     if (userId) {
       const users = loadUsers()
-      return users.find(u => u.id === userId) || loadUser()
+      return users.find(u => u.id === userId) || currentUser
     }
-    return loadUser()
+    return currentUser
   })
 
   const [dark, setDark] = useState(
@@ -23,10 +24,10 @@ export default function Profile() {
   const [isBioEditModalOpen, setIsBioEditModalOpen] = useState(false)
 
   const posts = loadPosts()
-    .filter(post => post.user.id === user?.id)
+    .filter(post => post.user?.id === user?.id)
     .slice(0, 6)
 
-  const isCurrentUser = !userId || userId === loadUser()?.id
+  const isCurrentUser = !userId || userId === currentUser?.id
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark)

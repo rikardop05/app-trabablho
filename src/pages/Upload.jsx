@@ -14,7 +14,7 @@ export default function Upload() {
   
   const user = useMemo(() => {
     const existingUser = loadUser()
-    return existingUser || { id: Math.random().toString(36).substr(2, 9), name: 'Usuário' }
+    return existingUser || { id: Date.now().toString(), name: 'Usuário' }
   }, [])
 
   const handleFileChange = async (e) => {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { saveUser, loadUsers, clearAllData, unifyStorage } from '../utils/storage'
+import { saveUser, loadUsers, clearAllData, unifyStorage, saveUsers, saveCurrentUserId } from '../utils/storage'
 
 export default function Login() {
   const [name, setName] = useState('')
@@ -9,40 +9,51 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    console.log('checkpoint: handleSubmit called')
       
     if (!name.trim()) {
+      console.log('checkpoint: name is empty')
       alert('Por favor, insira seu nome')
       return
     }
       
     unifyStorage()
-    clearAllData()
-      
+    console.log('checkpoint: unifyStorage called')
+       
     const users = loadUsers()
-    console.log('Usuários existentes:', users)
+    console.log('checkpoint: users loaded', users)
     console.log('Nome informado:', name.trim())
     console.log('Email informado:', email.trim())
-      
+       
     let user = users.find(u => u.email === email.trim())
-      
+    console.log('checkpoint: user found by email', user)
+       
     if (!user) {
       console.log('Nenhum usuário encontrado com o email:', email.trim())
       user = users.find(u => u.name === name.trim())
-      console.log('Buscando usuário pelo nome:', user)
+      console.log('checkpoint: user found by name', user)
     }
-      
+       
     if (!user) {
-      console.log('Criando novo usuário')
+      console.log('checkpoint: creating new user')
       user = {
-        id: Date.now(),
+        id: Date.now().toString(),
         name: name.trim(),
-        email: email.trim() || `${name.trim().toLowerCase()}@email.com`
+        email: email.trim() || `${name.trim().toLowerCase()}@email.com`,
+        avatar: null,
+        bio: '',
+        createdAt: new Date().toISOString()
       }
+      saveUsers([...users, user])
+      console.log('checkpoint: new user created', user)
     } else {
-      console.log('Usuário existente encontrado:', user)
+      console.log('checkpoint: existing user found', user)
     }
       
+    console.log('checkpoint: saving user', user)
     saveUser(user)
+    saveCurrentUserId(user.id)
+    console.log('checkpoint: navigating to home')
     navigate('/')
   }
 
