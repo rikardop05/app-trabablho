@@ -8,7 +8,7 @@ if (localStorage.getItem("dark_mode") === "true") {
   document.documentElement.classList.add("dark")
 }
 
-// Initialize responsive behavior
+// Incializa comportamento responsivo
 initResponsiveBehavior()
 
 ReactDOM.createRoot(document.getElementById('root')).render(

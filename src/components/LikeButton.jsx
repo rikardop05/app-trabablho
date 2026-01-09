@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Heart } from "lucide-react";
 
 /**
- * LikeButton component for liking posts with animated heart icon.
- * Toggles like state and updates count.
+ * botão de curtir que tem a intenção de contar impressões e não exatamente curtida, pois se trata de tragédias ambientais.
+ * Likes e contagem de curtidas.
  */
 export default function LikeButton({ initial = 0 }) {
   const [likes, setLikes] = useState(initial);

@@ -9,17 +9,17 @@ export default function StoriesBar() {
   const stories = loadStories() || []
   const users = loadUsers() || []
 
-  // remove duplicação do usuário logado
+  // remove duplicação do usuário logado e filtra admin
   const allUsers = [
     user,
-    ...users.filter((u) => u.id !== user?.id),
-  ].filter(Boolean)
+    ...users.filter((u) => u.id !== user?.id && u.role !== 'admin'),
+  ].filter(Boolean).filter(u => u.role !== 'admin')
 
   const getUserStories = (userId) =>
     stories.filter((story) => story.user?.id === userId)
 
   return (
-    <div className="flex justify-start gap-10 py-6 bg-transparent overflow-x-auto w-full">
+    <div className="flex justify-start gap-10 py-6 bg-transparent overflow-x-auto w-full max-w-none px-0 sm:px-4">
       {allUsers.map((u) => {
         const userStories = getUserStories(u.id)
         const hasStories = userStories.length > 0

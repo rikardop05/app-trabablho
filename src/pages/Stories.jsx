@@ -12,7 +12,7 @@ export default function Stories() {
   const [userPosts, setUserPosts] = useState([]);
 
   useEffect(() => {
-    // 1️⃣ Resolver usuário
+    // usuário
     const users = loadUsers() || [];
     const resolvedUser = users.find(
       u => String(u.id) === String(userId)
@@ -20,7 +20,7 @@ export default function Stories() {
 
     setUser(resolvedUser || null);
 
-    // 2️⃣ Resolver posts DO USUÁRIO
+    // posts DO USUÁRIO
     if (resolvedUser) {
       const allPosts = loadPosts() || [];
       const filteredPosts = allPosts.filter(
@@ -68,7 +68,7 @@ export default function Stories() {
     savePosts(updatedAll);
   };
 
-  // 🔴 Usuário não encontrado
+  // Usuário não encontrado
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-20">
