@@ -220,3 +220,14 @@ export function deletePost(postId) {
     console.error(`Erro ao excluir post ${postId}:`, error)
   }
 }
+
+export function deleteStory(storyId) {
+  try {
+    const stories = loadStories()
+    const updatedStories = stories.filter(s => s.id.toString() !== storyId.toString())
+    saveStories(updatedStories)
+    console.log(`Story ${storyId} excluído com sucesso`)
+  } catch (error) {
+    console.error(`Erro ao excluir story ${storyId}:`, error)
+  }
+}

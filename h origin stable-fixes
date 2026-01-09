@@ -1,0 +1,57 @@
+[1mdiff --git a/src/components/PostCard.jsx b/src/components/PostCard.jsx[m
+[1mindex 1a6a19a..f5ef6ba 100644[m
+[1m--- a/src/components/PostCard.jsx[m
+[1m+++ b/src/components/PostCard.jsx[m
+[36m@@ -11,7 +11,8 @@[m [mimport {[m
+   savePosts,[m
+   saveReport,[m
+   loadUser,[m
+[31m-  deletePost[m
+[32m+[m[32m  deletePost,[m
+[32m+[m[32m  deleteStory[m
+ } from "../utils/storage"[m
+ [m
+ import { categoryToOrg } from "../data/categories"[m
+[1mdiff --git a/src/main.jsx b/src/main.jsx[m
+[1mindex 97be11f..e90a302 100644[m
+[1m--- a/src/main.jsx[m
+[1m+++ b/src/main.jsx[m
+[36m@@ -3,6 +3,7 @@[m [mimport ReactDOM from 'react-dom/client'[m
+ import App from './App.jsx'[m
+ import './index.css'[m
+ import { initResponsiveBehavior } from './utils/responsive'[m
+[32m+[m[32mimport { createAdminUserIfNeeded } from './utils/auth'[m
+ [m
+ if (localStorage.getItem("dark_mode") === "true") {[m
+   document.documentElement.classList.add("dark")[m
+[36m@@ -11,6 +12,9 @@[m [mif (localStorage.getItem("dark_mode") === "true") {[m
+ // Incializa comportamento responsivo[m
+ initResponsiveBehavior()[m
+ [m
+[32m+[m[32m// Garante que o usuário admin exista[m
+[32m+[m[32mcreateAdminUserIfNeeded()[m
+[32m+[m
+ ReactDOM.createRoot(document.getElementById('root')).render([m
+   <React.StrictMode>[m
+     <App />[m
+[1mdiff --git a/src/utils/storage.js b/src/utils/storage.js[m
+[1mindex eb260c3..eef64cc 100644[m
+[1m--- a/src/utils/storage.js[m
+[1m+++ b/src/utils/storage.js[m
+[36m@@ -219,4 +219,15 @@[m [mexport function deletePost(postId) {[m
+   } catch (error) {[m
+     console.error(`Erro ao excluir post ${postId}:`, error)[m
+   }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport function deleteStory(storyId) {[m
+[32m+[m[32m  try {[m
+[32m+[m[32m    const stories = loadStories()[m
+[32m+[m[32m    const updatedStories = stories.filter(s => s.id.toString() !== storyId.toString())[m
+[32m+[m[32m    saveStories(updatedStories)[m
+[32m+[m[32m    console.log(`Story ${storyId} excluído com sucesso`)[m
+[32m+[m[32m  } catch (error) {[m
+[32m+[m[32m    console.error(`Erro ao excluir story ${storyId}:`, error)[m
+[32m+[m[32m  }[m
+ }[m
+\ No newline at end of file[m
