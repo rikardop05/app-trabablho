@@ -11,7 +11,8 @@ import {
   savePosts,
   saveReport,
   loadUser,
-  deletePost
+  deletePost,
+  deleteStory
 } from "../utils/storage"
 
 import { categoryToOrg } from "../data/categories"
