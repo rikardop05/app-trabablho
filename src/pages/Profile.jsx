@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { loadUser, saveUser, clearUser, loadPosts, loadUsers } from "../utils/storage"
+import { loadUser, saveUser, clearUser, loadPosts, loadUsers, isAdmin, deleteUserAndAllData } from "../utils/storage"
 import { compressImage } from "../utils/imageUtils"
 import { useNavigate, useParams } from "react-router-dom"
 import { Sun, Moon, LogOut, Upload, Edit2 } from "lucide-react"
@@ -22,12 +22,14 @@ export default function Profile() {
     localStorage.getItem("dark_mode") === "true"
   )
   const [isBioEditModalOpen, setIsBioEditModalOpen] = useState(false)
+  const [users, setUsers] = useState(() => loadUsers())
 
   const posts = loadPosts()
     .filter(post => post.user?.id === user?.id)
     .slice(0, 6)
 
   const isCurrentUser = !userId || userId === currentUser?.id
+  const isCurrentUserAdmin = isAdmin(currentUser)
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark)
@@ -64,6 +66,19 @@ export default function Profile() {
   if (!user) {
     navigate("/login")
     return null
+  }
+
+  const handleDeleteUser = (userIdToDelete) => {
+    if (userIdToDelete === currentUser.id) {
+      alert("Admin não pode excluir a si mesmo.")
+      return
+    }
+
+    const confirmDelete = confirm("Deseja excluir este usuário e TODOS os seus dados?")
+    if (confirmDelete) {
+      deleteUserAndAllData(userIdToDelete)
+      setUsers(users.filter(u => u.id !== userIdToDelete))
+    }
   }
 
   return (
@@ -144,6 +159,25 @@ export default function Profile() {
           </div>
         ))}
       </div>
+
+      {isCurrentUserAdmin && isCurrentUser && (
+        <div className="mt-10 w-full max-w-md mx-auto">
+          <h3 className="text-xl font-semibold mb-4 dark:text-white">Administração</h3>
+          <div className="space-y-2">
+            {users.map(userItem => (
+              <div key={userItem.id} className="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <span className="dark:text-white">{userItem.name}</span>
+                <button
+                  onClick={() => handleDeleteUser(userItem.id)}
+                  className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                >
+                  🗑
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {isBioEditModalOpen && (
         <BioEditModal

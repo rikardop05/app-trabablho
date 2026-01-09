@@ -157,6 +157,10 @@ export function saveUsers(users) {
   }
 }
 
+export function isAdmin(user) {
+  return user && user.role === 'admin'
+}
+
 export function clearAllData() {
   try {
     localStorage.removeItem(STORAGE_KEY)
@@ -167,6 +171,22 @@ export function clearAllData() {
     console.log('Todos os dados foram removidos do storage')
   } catch (error) {
     console.error('Erro ao limpar dados do storage:', error)
+  }
+}
+
+export function deleteUserAndAllData(userId) {
+  try {
+    const users = loadUsers().filter(u => u.id !== userId)
+    const posts = loadPosts().filter(p => p.user.id !== userId)
+    const stories = loadStories().filter(s => s.user.id !== userId)
+
+    saveUsers(users)
+    savePosts(posts)
+    saveStories(stories)
+
+    console.log(`Usuário ${userId} e todos os seus dados foram removidos com sucesso.`)
+  } catch (error) {
+    console.error(`Erro ao remover usuário ${userId} e seus dados:`, error)
   }
 }
 
@@ -187,5 +207,16 @@ export function unifyStorage() {
     console.log('Storage unificado com sucesso')
   } catch (error) {
     console.error('Erro ao unificar storage:', error)
+  }
+}
+
+export function deletePost(postId) {
+  try {
+    const posts = loadPosts()
+    const updatedPosts = posts.filter(p => p.id.toString() !== postId.toString())
+    savePosts(updatedPosts)
+    console.log(`Post ${postId} excluído com sucesso`)
+  } catch (error) {
+    console.error(`Erro ao excluir post ${postId}:`, error)
   }
 }

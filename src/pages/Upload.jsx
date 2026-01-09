@@ -8,6 +8,7 @@ export default function Upload() {
   const [caption, setCaption] = useState('')
   const [image, setImage] = useState('')
   const [category, setCategory] = useState('')
+  const [location, setLocation] = useState('')
   const [error, setError] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const navigate = useNavigate()
@@ -80,6 +81,7 @@ export default function Upload() {
       image,
       caption: caption.trim(),
       category,
+      location: location.trim() || null,
       likes: 0,
       comments: []
     }
@@ -151,6 +153,17 @@ export default function Upload() {
               <option key={cat.value} value={cat.value}>{cat.label}</option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Localização (opcional)</label>
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            placeholder="Ex: Av. Paulista, 1578 - SP"
+          />
         </div>
 
         <button

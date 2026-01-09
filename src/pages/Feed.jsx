@@ -28,7 +28,7 @@ export default function Feed() {
       </div>
 
       {/* FEED */}
-      <div className="p-4 mt-6 space-y-[50px]">
+      <div className="w-full max-w-none px-0 sm:px-4 mt-6 space-y-[50px]">
         {posts.map((post, index) => (
           <PostCard
             key={post.id}
