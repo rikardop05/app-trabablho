@@ -1,14 +1,14 @@
 /**
- * Responsive utilities for mobile/desktop detection and adaptation
+ * Utilidade responsiva para detectar dispositivos móveis e aplicar estilos
  */
 
 /**
- * Check if the current device is mobile
+ * Check se o dispositivo é móvel
  * @returns {boolean} - True if mobile device
  */
 export function isMobileDevice() {
   try {
-    // Check for mobile user agents including tablets
+    // Check por user agent móvel
     const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i
     return mobileRegex.test(navigator.userAgent)
   } catch {
@@ -17,12 +17,12 @@ export function isMobileDevice() {
 }
 
 /**
- * Check if we're running in a mobile browser environment
+ * Check se está rodando em um navegador móvel
  * @returns {boolean} - True if mobile browser
  */
 export function isMobileBrowser() {
   try {
-    // Check for touch support and mobile-specific properties
+    // Check por suporte touch
     return ('ontouchstart' in window) ||
            (navigator.maxTouchPoints > 0) ||
            (navigator.msMaxTouchPoints > 0)
@@ -32,7 +32,7 @@ export function isMobileBrowser() {
 }
 
 /**
- * Check if the current viewport is mobile-sized
+ * Check se a visualização é móvel (largura da janela)
  * @returns {boolean} - True if mobile viewport
  */
 export function isMobileViewport() {
@@ -44,7 +44,7 @@ export function isMobileViewport() {
 }
 
 /**
- * Check if we should use mobile layout
+ * Check se deve usar layout móvel
  * @returns {boolean} - True if mobile layout should be used
  */
 export function shouldUseMobileLayout() {
@@ -52,7 +52,7 @@ export function shouldUseMobileLayout() {
 }
 
 /**
- * Apply mobile-specific styles
+ * Aplica estilos móveis se necessário
  */
 export function applyMobileStyles() {
   if (shouldUseMobileLayout()) {
@@ -66,7 +66,7 @@ export function applyMobileStyles() {
 }
 
 /**
- * Reset to desktop styles
+ * Reset para estilos desktop
  */
 export function applyDesktopStyles() {
   const elements = document.querySelectorAll('[data-mobile-padding="true"]')
@@ -80,15 +80,15 @@ export function applyDesktopStyles() {
 }
 
 /**
- * Initialize responsive behavior
+ * Inicializa comportamento responsivo
  */
 export function initResponsiveBehavior() {
-  // Set initial state
+  // Seta estilos iniciais
   if (shouldUseMobileLayout()) {
     applyMobileStyles()
   }
 
-  // Add resize listener
+  // Adiciona listener para redimensionamento
   window.addEventListener('resize', () => {
     if (shouldUseMobileLayout()) {
       applyMobileStyles()

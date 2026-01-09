@@ -9,7 +9,7 @@ export default function Profile() {
   const navigate = useNavigate()
   const { userId } = useParams()
   const currentUser = loadUser()
-      
+       
   const [user, setUser] = useState(() => {
     if (userId) {
       const users = loadUsers()
@@ -35,6 +35,16 @@ export default function Profile() {
     document.documentElement.classList.toggle("dark", dark)
     localStorage.setItem("dark_mode", dark)
   }, [dark])
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login", { replace: true })
+    }
+  }, [user, navigate])
+
+  if (!user) {
+    return null
+  }
 
   const uploadAvatar = async (e) => {
     const file = e.target.files[0]
@@ -63,11 +73,6 @@ export default function Profile() {
     setIsBioEditModalOpen(false)
   }
 
-  if (!user) {
-    navigate("/login")
-    return null
-  }
-
   const handleDeleteUser = (userIdToDelete) => {
     if (userIdToDelete === currentUser.id) {
       alert("Admin não pode excluir a si mesmo.")
@@ -83,7 +88,7 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col p-4 pb-24 relative">
-      {/* Theme + Logout */}
+      {/* Tema + Logout */}
       <div className="absolute top-4 right-4 flex gap-2" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
         <button
           onClick={() => setDark(!dark)}

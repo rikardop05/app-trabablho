@@ -5,7 +5,6 @@
 /* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind utilities;
 
-/* Se quiser, pode adicionar estilos globais seus abaixo */
 body {
   font-family: sans-serif;
   background-color: white;

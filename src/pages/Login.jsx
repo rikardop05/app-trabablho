@@ -45,7 +45,7 @@ export default function Login() {
 
     saveUser(user)
     saveCurrentUserId(user.id)
-    navigate("/")
+    navigate("/feed", { replace: true })
   }
 
   return (

@@ -26,7 +26,7 @@ export const STORY_LIMITS = {
 }
 
 /**
- * Image compression utility for client-side resizing and compression
+ * compressão e redimencionamento de imagens usando canvas.
  * @param {File} file - The image file to compress
  * @param {Object} options - Compression options
  * @param {number} [options.maxWidth=1024] - Maximum width in pixels
@@ -73,7 +73,7 @@ export async function compressImage(file, options = {}) {
 }
 
 /**
- * Apply canvas-based compression to an image
+ * Aplica compressão usando canvas
  * @param {HTMLImageElement} img - Image element
  * @param {number} maxWidth - Maximum width
  * @param {number} maxHeight - Maximum height
@@ -82,13 +82,13 @@ export async function compressImage(file, options = {}) {
  * @returns {string} - Base64 encoded compressed image
  */
 function applyCanvasCompression(img, maxWidth, maxHeight, quality, maxSize) {
-  // Calculate new dimensions while maintaining aspect ratio
+  // calcula novas dimensões mantendo proporção
   let width = img.width
   let height = img.height
   
   console.log('Original aspect ratio:', width / height)
   
-  // Fixed aspect ratio calculation with better debugging
+  // dimensionamento se necessário
   if (width > maxWidth || height > maxHeight) {
     const widthRatio = maxWidth / width
     const heightRatio = maxHeight / height
@@ -108,7 +108,7 @@ function applyCanvasCompression(img, maxWidth, maxHeight, quality, maxSize) {
   
   console.log('Canvas created with dimensions:', canvas.width, canvas.height)
   
-  // Draw image with compression
+  // Desenha imagem com as novas dimensões
   try {
     ctx.drawImage(img, 0, 0, width, height)
     console.log('Image drawn to canvas successfully')
@@ -117,11 +117,11 @@ function applyCanvasCompression(img, maxWidth, maxHeight, quality, maxSize) {
     throw error
   }
   
-  // Convert to base64 with quality setting
+  // Concerte para base64 com qualidade inicial
   let compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
   console.log('Compressed data URL length:', compressedDataUrl.length)
 
-  // If size limit is specified, reduce quality further if needed
+  // Se o limite de tamanho for definido, ajuste a qualidade
   if (maxSize > 0) {
     const maxBytes = maxSize * 1024
     let currentQuality = quality
@@ -138,7 +138,7 @@ function applyCanvasCompression(img, maxWidth, maxHeight, quality, maxSize) {
 }
 
 /**
- * Check if adding new data would exceed localStorage limit
+ * Check se adicionar novos dados ultrapassa o limite de armazenamento
  * @param {string} newData - The data to be added
  * @returns {boolean} - True if there's enough space
  */
@@ -148,7 +148,7 @@ export function hasStorageSpace(newData) {
     const currentUsage = JSON.stringify(localStorage).length
     const estimatedNewSize = currentUsage + newData.length
 
-    // Test if we can write the data
+    // Testa se pode adicionar
     localStorage.setItem(testKey, newData)
     localStorage.removeItem(testKey)
     
@@ -159,7 +159,7 @@ export function hasStorageSpace(newData) {
 }
 
 /**
- * Calculate estimated storage usage
+ * Calcula o uso atual do localStorage
  * @returns {number} - Estimated usage in bytes
  */
 export function getStorageUsage() {
@@ -171,32 +171,32 @@ export function getStorageUsage() {
 }
 
 /**
- * Generate a reliable placeholder image URL
+ * Gera uma URL de imagem placeholder confiável
  * @param {string} userId - User ID for unique placeholder
  * @param {string} type - Type of placeholder ('avatar', 'post', 'story')
  * @returns {string} - Placeholder image URL
  */
 export function getPlaceholderImage(userId = '', type = 'avatar') {
-  // Use different services for better reliability
+  // Usa serviços de avatar públicos confiáveis
   const services = [
     `https://i.pravatar.cc/150?u=${userId}`,
     `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
     `https://ui-avatars.com/api/?name=User&background=random&size=150`
   ];
   
-  // Return first service that works (we'll try them in order)
+  // retorna o primeiro serviço disponível
   return services[0];
 }
 
 /**
- * Safely get user avatar URL with fallback
+ * obtem a URL do avatar do usuário com fallback
  * @param {Object} user - User object
  * @returns {string} - Valid avatar URL or placeholder
  */
 export function getUserAvatar(user) {
   if (!user) return getPlaceholderImage('', 'avatar');
   
-  // Check if avatar exists and is not empty string
+  // Check se avatar existe e não é string vazia
   if (user.avatar && user.avatar.trim().length > 0) {
     return user.avatar;
   }
@@ -206,14 +206,14 @@ export function getUserAvatar(user) {
 }
 
 /**
- * Safely get story image URL with fallback
+ * garante com segurança a URL da imagem do post
  * @param {Object} story - Story object
  * @returns {string} - Valid image URL or placeholder
  */
 export function getStoryImage(story) {
   if (!story) return getPlaceholderImage('', 'story');
   
-  // Check if image exists and is not empty string
+  // Check se a imagem existe e não é string vazia
   if (story.image && story.image.trim().length > 0) {
     return story.image;
   }

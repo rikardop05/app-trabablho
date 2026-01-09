@@ -115,7 +115,7 @@ export function saveReport(report) {
     reports.push(report)
     localStorage.setItem(REPORTS_KEY, JSON.stringify(reports))
   } catch {
-    // Silent fail
+    // erro silencioso
   }
 }
 
@@ -136,7 +136,7 @@ export function saveStories(stories) {
   try {
     localStorage.setItem(STORIES_KEY, JSON.stringify(stories))
   } catch {
-    // Silent fail
+    // erro silencioso
   }
 }
 
@@ -153,7 +153,7 @@ export function saveUsers(users) {
   try {
     localStorage.setItem('app_users_v1', JSON.stringify(users))
   } catch {
-    // Silent fail
+    // erro silencioso
   }
 }
 

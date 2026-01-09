@@ -1,11 +1,25 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { clearUser } from "../utils/storage"
+import { clearUser, loadUser } from "../utils/storage"
 import { Sun, Moon, LogOut } from "lucide-react"
 
 export default function Settings() {
   const navigate = useNavigate()
   const [dark, setDark] = useState(false)
+  const [user, setUser] = useState(null)
+
+  // Carrega usuário atual (defensivo)
+  useEffect(() => {
+    const currentUser = loadUser()
+    setUser(currentUser)
+  }, [])
+
+  // Proteção extra (SEM navegar no render)
+  useEffect(() => {
+    if (user === null) {
+      navigate("/login", { replace: true })
+    }
+  }, [user, navigate])
 
   // Carrega tema salvo
   useEffect(() => {
@@ -25,6 +39,8 @@ export default function Settings() {
     clearUser()
     navigate("/login", { replace: true })
   }
+
+  if (!user) return null
 
   return (
     <div className="p-6 max-w-md mx-auto space-y-8">

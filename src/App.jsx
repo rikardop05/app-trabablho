@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 
 import MainLayout from "./layouts/MainLayout"
-
 import Feed from "./pages/Feed"
 import Login from "./pages/Login"
 import Profile from "./pages/Profile"
@@ -11,40 +10,30 @@ import Stories from "./pages/Stories"
 import PostDetail from "./pages/PostDetail"
 import Upload from "./pages/Upload"
 
-import { loadCurrentUserId, loadUser } from "./utils/storage"
+import { loadCurrentUserId } from "./utils/storage"
 
-/**
- * AuthGuard CORRETO
- * - currentUserId é a ÚNICA fonte de autenticação
- * - loadUser é apenas dado complementar
- */
 function AuthGuard({ children }) {
   const [ready, setReady] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authenticated, setAuthenticated] = useState(false)
 
   useEffect(() => {
-    const userId = loadCurrentUserId()
-    setIsAuthenticated(Boolean(userId))
+    setAuthenticated(Boolean(loadCurrentUserId()))
     setReady(true)
   }, [])
 
   if (!ready) return null
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
-  }
-
-  return children
+  return authenticated
+    ? children
+    : <Navigate to="/login" replace />
 }
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota pública */}
         <Route path="/login" element={<Login />} />
 
-        {/* Rotas protegidas */}
         <Route
           element={
             <AuthGuard>
@@ -60,7 +49,7 @@ export default function App() {
           <Route path="/upload" element={<Upload />} />
         </Route>
 
-        {/* Fallback seguro */}
+        {/* qualquer coisa cai no feed */}
         <Route path="*" element={<Navigate to="/feed" replace />} />
       </Routes>
     </BrowserRouter>

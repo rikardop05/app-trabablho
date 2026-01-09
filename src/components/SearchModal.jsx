@@ -4,7 +4,7 @@ import PostCard from "./PostCard";
 import { Search, X } from "lucide-react";
 
 /**
- * SearchModal component for searching posts in a modal overlay.
+ * descontinuado.
  */
 export default function SearchModal({ onClose }) {
   const [query, setQuery] = useState("");
