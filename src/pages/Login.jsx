@@ -64,7 +64,7 @@ export default function Login() {
 
           {/* Título */}
           <h1 className="text-center text-lg font-semibold text-gray-900 dark:text-white leading-snug">
-            Sistema de Denúncias Ambientais
+            Observe e Preserve
           </h1>
 
           {/* Formulário */}
