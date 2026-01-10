@@ -1,4 +1,4 @@
-# Sistema de Denúncias Ambientais
+# Sistema de Denúncias Ambientais - Observe e Preserve
 
 Aplicação web desenvolvida em React + Vite, com persistência local via localStorage.
 O projeto simula um app para denúncias ambientais, sem uso de backend.
