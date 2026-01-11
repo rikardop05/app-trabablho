@@ -14,9 +14,13 @@ O projeto simula um app para denúncias ambientais, sem uso de backend.
 ---
 
 ### Windows
-1 Abra a pasta do projeto
+1 Extraia o arquivo zip e abra a pasta do projeto
 2 Dê duplo clique em `start.bat`
 3 Aguarde o navegador abrir
+
+OBS: caso o powershell feche e nada aconteça, ele instalou os pré requisitos, basta abrir novamente que a página será aberta.
+
+Para testar o modo administrador para excluir posts e usuários, basta entrar com o usuário: Admin
 
 ---
 
